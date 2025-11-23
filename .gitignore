@@ -18,6 +18,8 @@ Thumbs.db
 *.jks
 *.keystore
 
+app/signing.properties
+app/release.keystore
+
 # Gradle Wrapper should be committed
 # (keep gradle/wrapper/** and gradlew files tracked)
-

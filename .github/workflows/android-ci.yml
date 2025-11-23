@@ -37,7 +37,26 @@ jobs:
           gradle-version: '8.7'
           arguments: clean assembleDebug
 
-      - name: Assemble Release (unsigned)
+      - name: Generate temporary release keystore
+        run: |
+          keytool -genkeypair \
+            -keystore app/release.keystore \
+            -storepass android \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 365 \
+            -alias release \
+            -dname "CN=CI,O=CI,L=CI,S=CI,C=US"
+
+      - name: Configure release signing properties
+        run: |
+          echo "storeFile=$(pwd)/app/release.keystore" > app/signing.properties
+          echo "storePassword=android" >> app/signing.properties
+          echo "keyAlias=release" >> app/signing.properties
+          echo "keyPassword=android" >> app/signing.properties
+
+      - name: Assemble Release (signed)
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: '8.7'
@@ -49,8 +68,8 @@ jobs:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: Upload Release APK (unsigned)
+      - name: Upload Release APK (signed)
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-unsigned-apk
+          name: app-release-apk
           path: app/build/outputs/apk/release/*.apk

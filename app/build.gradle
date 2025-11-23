@@ -15,10 +15,25 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            def propsFile = file("$projectDir/signing.properties")
+            if (propsFile.exists()) {
+                def props = new Properties()
+                props.load(propsFile.newInputStream())
+                storeFile file(props['storeFile'])
+                storePassword props['storePassword']
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
