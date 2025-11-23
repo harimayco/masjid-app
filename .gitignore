@@ -1,0 +1,23 @@
+# Android/Gradle
+*.iml
+.gradle/
+/local.properties
+/.idea/
+/build/
+/app/build/
+.externalNativeBuild/
+.cxx/
+captures/
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Keystores (do not commit secrets)
+*.jks
+*.keystore
+
+# Gradle Wrapper should be committed
+# (keep gradle/wrapper/** and gradlew files tracked)
+
