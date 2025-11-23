@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,7 +42,17 @@ jobs:
           gradle-version: '8.7'
           arguments: clean assembleDebug
 
+      - name: Use provided release keystore (from secrets)
+        if: ${{ env.KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > app/release.keystore
+          echo "storeFile=$(pwd)/app/release.keystore" > app/signing.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> app/signing.properties
+          echo "keyAlias=$KEY_ALIAS" >> app/signing.properties
+          echo "keyPassword=$KEY_PASSWORD" >> app/signing.properties
+
       - name: Generate temporary release keystore
+        if: ${{ env.KEYSTORE_BASE64 == '' }}
         run: |
           keytool -genkeypair \
             -keystore app/release.keystore \
@@ -49,7 +64,8 @@ jobs:
             -alias release \
             -dname "CN=CI,O=CI,L=CI,S=CI,C=US"
 
-      - name: Configure release signing properties
+      - name: Configure release signing properties (temp)
+        if: ${{ env.KEYSTORE_BASE64 == '' }}
         run: |
           echo "storeFile=$(pwd)/app/release.keystore" > app/signing.properties
           echo "storePassword=android" >> app/signing.properties
