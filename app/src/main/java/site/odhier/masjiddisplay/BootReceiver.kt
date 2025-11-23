@@ -6,7 +6,10 @@ import android.content.Intent
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
+        val action = intent.action
+        if (Intent.ACTION_BOOT_COMPLETED == action ||
+            Intent.ACTION_LOCKED_BOOT_COMPLETED == action ||
+            Intent.ACTION_MY_PACKAGE_REPLACED == action) {
             val i = Intent(context, MainActivity::class.java)
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(i)
